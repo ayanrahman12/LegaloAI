@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  industry  String?
+  location  String?
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      String
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Obligation {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  status      String
+  owner       String?
+  dueDate     DateTime?
+  citations   Citation[]
+  evidences   Evidence[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Citation {
+  id           String     @id @default(cuid())
+  title        String
+  section      String
+  summary      String?
+  obligation   Obligation? @relation(fields: [obligationId], references: [id])
+  obligationId String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Evidence {
+  id           String     @id @default(cuid())
+  title        String
+  type         String?
+  storageUrl   String?
+  obligation   Obligation? @relation(fields: [obligationId], references: [id])
+  obligationId String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
